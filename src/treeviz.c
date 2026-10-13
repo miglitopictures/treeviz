@@ -15,7 +15,7 @@ struct BSTNode
     float y;
     float tx;
     float ty;
-    float size;
+    float radius;
     
     struct BSTNode *left;
     struct BSTNode *right;
@@ -31,7 +31,7 @@ void insert_bst_rec(BSTNode **root, int data, float x, float y) {
         newNode->left = NULL;
         newNode->right = NULL;
 
-        newNode->size = 20;
+        newNode->radius = 20;
         newNode->x = x;
         newNode->y = y;
         newNode->tx = x;
@@ -143,9 +143,9 @@ void update_bst(BSTNode **root) {
     (*root)->y = Lerp((*root)->y,(*root)->ty,0.1);
 
     float distance = Vector2Distance(GetMousePosition(), (Vector2){(*root)->x, (*root)->y});
-    if (distance <= (*root)->size)
+    if (distance <= (*root)->radius)
     {   // HOVER
-        (*root)->size = 25;
+        (*root)->radius = 25;
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
             remove_bst(root, (*root)->data);
@@ -155,7 +155,7 @@ void update_bst(BSTNode **root) {
     else
     {
         
-        (*root)->size = 20;
+        (*root)->radius = 20;
     }
 
     update_bst(&(*root)->left);
@@ -166,14 +166,14 @@ void draw_bst(BSTNode *root) {
     if (!root) return;
     
     if (root->left)
-    DrawLineEx((Vector2){root->x, root->y}, (Vector2){root->left->x, root->left->y}, root->size/4, BLACK);
+    DrawLineEx((Vector2){root->x, root->y}, (Vector2){root->left->x, root->left->y}, root->radius/4, BLACK);
     if (root->right)
-    DrawLineEx((Vector2){root->x, root->y}, (Vector2){root->right->x, root->right->y}, root->size/4, BLACK);
+    DrawLineEx((Vector2){root->x, root->y}, (Vector2){root->right->x, root->right->y}, root->radius/4, BLACK);
     
-    DrawCircle(root->x, root->y, root->size, RED);
+    DrawCircle(root->x, root->y, root->radius, RED);
     const char *dataStr = TextFormat("%d", root->data);
-    float width = MeasureText(dataStr, root->size);
-    DrawText(dataStr, root->x - width/2, root->y - root->size/2, root->size, BLACK);
+    float width = MeasureText(dataStr, root->radius);
+    DrawText(dataStr, root->x - width/2, root->y - root->radius/2, root->radius, BLACK);
     
     draw_bst(root->left);
     draw_bst(root->right);
