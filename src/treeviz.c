@@ -8,6 +8,8 @@
 void update_bst(BSTNode **root) {
     if (!*root) return;
 
+    (*root)->x = Lerp((*root)->x,(*root)->tx,0.1);
+    (*root)->y = Lerp((*root)->y,(*root)->ty,0.1);
 
     float distance = Vector2Distance(GetMousePosition(), (Vector2){(*root)->x, (*root)->y});
     if (distance <= (*root)->size)

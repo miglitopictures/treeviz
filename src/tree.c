@@ -11,18 +11,15 @@ void insert_bst_rec(BSTNode **root, int data) {
         newNode->left = NULL;
         newNode->right = NULL;
 
-        // newNode->x = x;
-        // newNode->y = y;
         newNode->size = 20;
+        newNode->tx = 300;
+        newNode->ty = 40;
+        newNode->x = 300;
+        newNode->y = 40;
 
         *root = newNode;
         return;
     }
-
-    // float nextY = y + 50;
-    // float nextSize = size / 2;
-    // float nextXOffset = size * 4;
-
     
     if (data < (*root)->data)
     {
@@ -48,8 +45,8 @@ void layout_bst(BSTNode *root, float x, float y, float offset) {
         return;
     }
 
-    root->x = x;
-    root->y = y;
+    root->tx = x;
+    root->ty = y;
 
     float nextY = y + 50;
     float nextXOffset = offset * 4;

@@ -8,6 +8,8 @@ struct BSTNode
     
     float x;
     float y;
+    float tx;
+    float ty;
     float size;
     
     struct BSTNode *left;
