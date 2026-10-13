@@ -94,16 +94,22 @@ void remove_bst(BSTNode **root, int data) {
         // 2 children
         if ((*root)->left && (*root)->right) {
 
+            BSTNode *toRemove = *root;
+            BSTNode *originalLeftBranch = (*root)->left;
+
+            *root = (*root)->right;
+
             // find smallest in left tree
-            BSTNode *min = (*root)->right;
+            BSTNode *min = *root;
             while (min->left) {
                 min = min->left;
             }
-            
-            // new root value
-            (*root)->data = min->data;
 
-            remove_bst(&(*root)->right, min->data);
+            min->left = originalLeftBranch;
+
+            free(toRemove);
+
+
         }
         else if (!(*root)->left && !(*root)->right) {
             free(*root);
@@ -117,6 +123,48 @@ void remove_bst(BSTNode **root, int data) {
         }
     }
 }
+
+// void remove_bst(BSTNode **root, int data) {
+//     if (*root == NULL) return;
+    
+//     if (data > (*root)->data)
+//     {
+//         remove_bst(&(*root)->right, data);
+//         return;
+//     } 
+//     else if (data < (*root)->data)
+//     {
+//         remove_bst(&(*root)->left, data);
+//         return;
+//     }
+//     else // found data
+//     {
+//         // 2 children
+//         if ((*root)->left && (*root)->right) {
+
+//             // find smallest in left tree
+//             BSTNode *min = (*root)->right;
+//             while (min->left) {
+//                 min = min->left;
+//             }
+            
+//             // new root value
+//             (*root)->data = min->data;
+
+//             remove_bst(&(*root)->right, min->data);
+//         }
+//         else if (!(*root)->left && !(*root)->right) {
+//             free(*root);
+//             *root = NULL;
+//         }
+//         else
+//         {
+//             BSTNode *tmp = *root;
+//             *root = (*root)->right ? (*root)->right : (*root)->left;
+//             free(tmp);
+//         }
+//     }
+// }
 
 void print_bst(BSTNode *root) {
     if (!root) return;
