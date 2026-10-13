@@ -3,10 +3,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define LVL_HEIGHT 50
-
-
-
 void insert_bst_rec(BSTNode **root, int data, float x, float y, float size) {
     if (!*root)
     {

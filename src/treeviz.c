@@ -1,11 +1,8 @@
 #include <math.h>
-
 #include <raylib.h>
 #include <raymath.h>
-
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
-
 #include "tree.h"
 
 void update_bst(BSTNode **root) {
@@ -47,25 +44,29 @@ void draw_bst(BSTNode *root) {
     draw_bst(root->right);
 }
 
-
+void insert_starting_nodes(BSTNode **tree) {
+    insert_bst(tree, 50);
+    insert_bst(tree, 20);
+    insert_bst(tree, 70);
+    insert_bst(tree, 10);
+    insert_bst(tree, 60);
+    insert_bst(tree, 55);
+    insert_bst(tree, 6);
+    insert_bst(tree, 15);
+    insert_bst(tree, 25);
+    insert_bst(tree, 45);
+    insert_bst(tree, 23);
+    insert_bst(tree, 12);
+    insert_bst(tree, 65);
+}
 
 int main() {
+    /* Setup */
 
     BSTNode *tree = NULL;
 
-    insert_bst(&tree, 50);
-    insert_bst(&tree, 20);
-    insert_bst(&tree, 70);
-    insert_bst(&tree, 10);
-    insert_bst(&tree, 60);
-    insert_bst(&tree, 55);
-    insert_bst(&tree, 6);
-    insert_bst(&tree, 15);
-    insert_bst(&tree, 25);
-    insert_bst(&tree, 45);
-    insert_bst(&tree, 23);
-    insert_bst(&tree, 12);
-    insert_bst(&tree, 65);
+    // starting tree (demo)
+    insert_starting_nodes(&tree);
 
     InitWindow(600,600, "Trees");
     SetTargetFPS(30);
@@ -73,8 +74,9 @@ int main() {
     float selectedValue = 50;
     while (!WindowShouldClose())
     {
+        /* Update */
         update_bst(&tree);
-        /* Render */
+        /* Draw */
         BeginDrawing();
 
             ClearBackground(RAYWHITE);
@@ -82,6 +84,11 @@ int main() {
             draw_bst(tree);
 
             // interface
+            if (GuiButton((Rectangle) {40, GetScreenHeight() - 220, 100, 40},"default tree"))
+            {
+                insert_starting_nodes(&tree);
+            }
+
             if (GuiButton((Rectangle) {40, GetScreenHeight() - 160, 100, 40},"Clear tree"))
             {
                 free_bst(&tree);
