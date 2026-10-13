@@ -76,17 +76,17 @@ void layout_bst(BSTNode *root, float x, float y, float offset) {
     return;
 }
 
-void remove_bst(BSTNode **root, int data) {
+void remove_bst(BSTNode **root, int data, int mode) {
     if (*root == NULL) return;
     
     if (data > (*root)->data)
     {
-        remove_bst(&(*root)->right, data);
+        remove_bst(&(*root)->right, data, mode);
         return;
     } 
     else if (data < (*root)->data)
     {
-        remove_bst(&(*root)->left, data);
+        remove_bst(&(*root)->left, data, mode);
         return;
     }
     else // found data
@@ -94,20 +94,44 @@ void remove_bst(BSTNode **root, int data) {
         // 2 children
         if ((*root)->left && (*root)->right) {
 
-            BSTNode *toRemove = *root;
-            BSTNode *originalLeftBranch = (*root)->left;
-
-            *root = (*root)->right;
-
-            // find smallest in left tree
-            BSTNode *min = *root;
-            while (min->left) {
-                min = min->left;
+            switch (mode)
+            {
+                case 0: {   // by merge
+                    BSTNode *tmp = *root;
+                    BSTNode *originalLeftBranch = (*root)->left;
+                    
+                    *root = (*root)->right;
+        
+                    // find smallest in left tree
+                    BSTNode *min = *root;
+                    while (min->left) {
+                        min = min->left;
+                    }
+        
+                    min->left = originalLeftBranch;
+        
+                    free(tmp);
+                    break;
+                }
+                default: { // by splice
+                    BSTNode **link = &(*root)->right;
+                    // find smallest in left tree
+                    while ((*link)->left) {
+                        link = &(*link)->left;
+                    }
+    
+                    BSTNode *min = *link;
+                    *link = min->right;
+    
+                    min->left = (*root)->left;
+                    min->right = (*root)->right;
+                    
+                    // new root value
+                    free(*root);
+                    *root = min;
+                    break;
+                }
             }
-
-            min->left = originalLeftBranch;
-
-            free(toRemove);
 
 
         }
@@ -123,48 +147,6 @@ void remove_bst(BSTNode **root, int data) {
         }
     }
 }
-
-// void remove_bst(BSTNode **root, int data) {
-//     if (*root == NULL) return;
-    
-//     if (data > (*root)->data)
-//     {
-//         remove_bst(&(*root)->right, data);
-//         return;
-//     } 
-//     else if (data < (*root)->data)
-//     {
-//         remove_bst(&(*root)->left, data);
-//         return;
-//     }
-//     else // found data
-//     {
-//         // 2 children
-//         if ((*root)->left && (*root)->right) {
-
-//             // find smallest in left tree
-//             BSTNode *min = (*root)->right;
-//             while (min->left) {
-//                 min = min->left;
-//             }
-            
-//             // new root value
-//             (*root)->data = min->data;
-
-//             remove_bst(&(*root)->right, min->data);
-//         }
-//         else if (!(*root)->left && !(*root)->right) {
-//             free(*root);
-//             *root = NULL;
-//         }
-//         else
-//         {
-//             BSTNode *tmp = *root;
-//             *root = (*root)->right ? (*root)->right : (*root)->left;
-//             free(tmp);
-//         }
-//     }
-// }
 
 void print_bst(BSTNode *root) {
     if (!root) return;
@@ -184,7 +166,7 @@ void free_bst(BSTNode **root) {
     return;
 }
 
-void update_bst(BSTNode **root) {
+void update_bst(BSTNode **root, int removal_mode) {
     if (!*root) return;
 
     (*root)->x = Lerp((*root)->x,(*root)->tx,0.1);
@@ -196,7 +178,7 @@ void update_bst(BSTNode **root) {
         (*root)->radius = 25;
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
-            remove_bst(root, (*root)->data);
+            remove_bst(root, (*root)->data, removal_mode);
             return;
         }
     }
@@ -206,8 +188,8 @@ void update_bst(BSTNode **root) {
         (*root)->radius = 20;
     }
 
-    update_bst(&(*root)->left);
-    update_bst(&(*root)->right);
+    update_bst(&(*root)->left, removal_mode);
+    update_bst(&(*root)->right, removal_mode);
 }
 
 void draw_bst(BSTNode *root) {
@@ -244,8 +226,19 @@ void insert_starting_nodes(BSTNode **tree) {
     insert_bst(tree, 65);
 }
 
+
+typedef struct State {
+    int removal_mode;
+    float selected_value;
+} State;
+
+
 int main() {
     /* Setup */
+
+    State app = {0};
+    app.removal_mode = 0;
+    app.selected_value = 50;
 
     BSTNode *tree = NULL;
 
@@ -255,11 +248,13 @@ int main() {
     InitWindow(600,600, "Trees");
     SetTargetFPS(30);
 
-    float selectedValue = 50;
+    bool removalDropdownEditMode = false;
+
+
     while (!WindowShouldClose())
     {
         /* Update */
-        update_bst(&tree);
+        update_bst(&tree, app.removal_mode);
         layout_bst(tree, 300, 40, 20);
         /* Draw */
         BeginDrawing();
@@ -269,20 +264,27 @@ int main() {
             draw_bst(tree);
 
             // interface
-            if (GuiButton((Rectangle) {40, GetScreenHeight() - 220, 100, 40},"default tree"))
+            if (GuiDropdownBox((Rectangle) {40, 40, 100, 40}, "Merge;Splice", &app.removal_mode, removalDropdownEditMode))
+            {
+                removalDropdownEditMode = !removalDropdownEditMode;
+            }
+
+
+            if (GuiButton((Rectangle) {40, GetScreenHeight() - 200, 100, 40},"default tree"))
             {
                 insert_starting_nodes(&tree);
             }
 
-            if (GuiButton((Rectangle) {40, GetScreenHeight() - 160, 100, 40},"Clear tree"))
+            if (GuiButton((Rectangle) {40, GetScreenHeight() - 150, 100, 40},"Clear tree"))
             {
                 free_bst(&tree);
             }
 
-            GuiSliderBar((Rectangle) {40, GetScreenHeight() - 50, GetScreenWidth() - 80, 20},"0", "99", &selectedValue, 0, 99);
-            if (GuiButton((Rectangle) {40, GetScreenHeight() - 100, 100, 40},TextFormat("Add %.0f", floor(selectedValue))))
+            GuiSliderBar((Rectangle) {40, GetScreenHeight() - 50, GetScreenWidth() - 80, 20},"0", "99", &app.selected_value, 0, 99);
+
+            if (GuiButton((Rectangle) {40, GetScreenHeight() - 100, 100, 40},TextFormat("Add %.0f", floor(app.selected_value))))
             {
-                insert_bst(&tree, floor(selectedValue));
+                insert_bst(&tree, floor(app.selected_value));
             }
 
         EndDrawing();
