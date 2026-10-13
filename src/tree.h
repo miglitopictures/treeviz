@@ -18,6 +18,7 @@ typedef struct BSTNode BSTNode;
 
 void insert_bst(BSTNode **root, int data);
 void remove_bst(BSTNode **root, int data);
+void layout_bst(BSTNode *root, float x, float y, float offset);
 void print_bst(BSTNode *root);
 void free_bst(BSTNode **root);
 

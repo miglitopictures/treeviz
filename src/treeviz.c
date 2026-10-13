@@ -7,6 +7,8 @@
 
 void update_bst(BSTNode **root) {
     if (!*root) return;
+
+
     float distance = Vector2Distance(GetMousePosition(), (Vector2){(*root)->x, (*root)->y});
     if (distance <= (*root)->size)
     {   // HOVER
@@ -77,6 +79,7 @@ int main() {
     {
         /* Update */
         update_bst(&tree);
+        layout_bst(tree, 300, 40, 20);
         /* Draw */
         BeginDrawing();
 

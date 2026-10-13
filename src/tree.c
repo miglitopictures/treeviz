@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void insert_bst_rec(BSTNode **root, int data, float x, float y, float size) {
+void insert_bst_rec(BSTNode **root, int data) {
     if (!*root)
     {
         BSTNode *newNode = malloc(sizeof(BSTNode));
@@ -11,47 +11,67 @@ void insert_bst_rec(BSTNode **root, int data, float x, float y, float size) {
         newNode->left = NULL;
         newNode->right = NULL;
 
-        newNode->x = x;
-        newNode->y = y;
+        // newNode->x = x;
+        // newNode->y = y;
         newNode->size = 20;
 
         *root = newNode;
         return;
     }
 
-    float nextY = y + 50;
-    float nextSize = size / 2;
-    float nextXOffset = size * 4;
+    // float nextY = y + 50;
+    // float nextSize = size / 2;
+    // float nextXOffset = size * 4;
 
     
     if (data < (*root)->data)
     {
-        insert_bst_rec(&(*root)->left, data, x - nextXOffset, nextY, nextSize);
+        insert_bst_rec(&(*root)->left, data);
     }
     else if (data > (*root)->data)
     {
-        insert_bst_rec(&(*root)->right, data, x + nextXOffset, nextY, nextSize);
+        insert_bst_rec(&(*root)->right, data);
     }
 
     return;
 }
 
 void insert_bst(BSTNode **root, int data) {
-    insert_bst_rec(root, data, 300, 40, 20);
+    insert_bst_rec(root, data);
+    // layout_bst(*root, 300, 40, 20);
     return;
 }
 
-void remove_bst(BSTNode **root, int data) {
+void layout_bst(BSTNode *root, float x, float y, float offset) {
+    if (!root)
+    {
+        return;
+    }
+
+    root->x = x;
+    root->y = y;
+
+    float nextY = y + 50;
+    float nextXOffset = offset * 4;
+    float nextOffset = offset / 2;
+    
+    layout_bst(root->left, x - nextXOffset, nextY, nextOffset);
+    layout_bst(root->right, x + nextXOffset, nextY, nextOffset);
+
+    return;
+}
+
+void remove_bst_rec(BSTNode **root, int data) {
     if (*root == NULL) return;
     
     if (data > (*root)->data)
     {
-        remove_bst(&(*root)->right, data);
+        remove_bst_rec(&(*root)->right, data);
         return;
     } 
     else if (data < (*root)->data)
     {
-        remove_bst(&(*root)->left, data);
+        remove_bst_rec(&(*root)->left, data);
         return;
     }
     else // found data
@@ -68,7 +88,7 @@ void remove_bst(BSTNode **root, int data) {
             // new root value
             (*root)->data = min->data;
 
-            remove_bst(&(*root)->right, min->data);
+            remove_bst_rec(&(*root)->right, min->data);
         }
         else if (!(*root)->left && !(*root)->right) {
             free(*root);
@@ -81,6 +101,11 @@ void remove_bst(BSTNode **root, int data) {
             free(tmp);
         }
     }
+}
+
+void remove_bst(BSTNode **root, int data){
+    remove_bst_rec(root, data);
+    // layout_bst(*root, 300, 40, 20);
 }
 
 void print_bst(BSTNode *root) {
