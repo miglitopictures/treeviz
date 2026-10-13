@@ -5,6 +5,11 @@
 struct BSTNode
 {
     int data;
+    
+    float x;
+    float y;
+    float size;
+    
     struct BSTNode *left;
     struct BSTNode *right;
 };
@@ -12,6 +17,7 @@ struct BSTNode
 typedef struct BSTNode BSTNode;
 
 void insert_bst(BSTNode **root, int data);
+void remove_bst(BSTNode **root, int data);
 void print_bst(BSTNode *root);
 void free_bst(BSTNode **root);
 

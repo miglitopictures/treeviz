@@ -8,30 +8,45 @@
 
 #include "tree.h"
 
-void animate_bst(BSTNode *root) {
-    if (!root) return;
-    // float distance = Vector2Distance
+void update_bst(BSTNode **root) {
+    if (!*root) return;
+    float distance = Vector2Distance(GetMousePosition(), (Vector2){(*root)->x, (*root)->y});
+    if (distance <= (*root)->size)
+    {   // HOVER
+        (*root)->size = 25;
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        {
+            remove_bst(root, (*root)->data);
+            return;
+        }
+    }
+    else
+    {
+        
+        (*root)->size = 20;
+    }
+
+    update_bst(&(*root)->left);
+    update_bst(&(*root)->right);
 }
 
-void draw_bst(BSTNode *root, float x, float y, float size) {
+void draw_bst(BSTNode *root) {
     if (!root) return;
     
-    float nextY = y + 50;
-    float nextLeftX  = x - size * 4;
-    float nextRightX = x + size * 4;
-    
     if (root->left)
-    DrawLineEx((Vector2){x, y}, (Vector2){nextLeftX, nextY}, 5, BLACK);
+    DrawLineEx((Vector2){root->x, root->y}, (Vector2){root->left->x, root->left->y}, root->size/4, BLACK);
     if (root->right)
-    DrawLineEx((Vector2){x, y}, (Vector2){nextRightX, nextY}, 5, BLACK);
-    const char *dataStr = TextFormat("%d", root->data);
-    float width = MeasureText(dataStr, 20);
-    DrawCircle(x, y, 20, RED);
-    DrawText(dataStr, x - width/2, y - 10, 20, BLACK);
+    DrawLineEx((Vector2){root->x, root->y}, (Vector2){root->right->x, root->right->y}, root->size/4, BLACK);
     
-    draw_bst(root->left, nextLeftX, nextY, size/2);
-    draw_bst(root->right, nextRightX, nextY, size/2);
+    DrawCircle(root->x, root->y, root->size, RED);
+    const char *dataStr = TextFormat("%d", root->data);
+    float width = MeasureText(dataStr, root->size);
+    DrawText(dataStr, root->x - width/2, root->y - root->size/2, root->size, BLACK);
+    
+    draw_bst(root->left);
+    draw_bst(root->right);
 }
+
 
 
 int main() {
@@ -53,17 +68,18 @@ int main() {
     insert_bst(&tree, 65);
 
     InitWindow(600,600, "Trees");
-    SetTargetFPS(60);
+    SetTargetFPS(30);
 
     float selectedValue = 50;
     while (!WindowShouldClose())
     {
+        update_bst(&tree);
         /* Render */
         BeginDrawing();
 
             ClearBackground(RAYWHITE);
 
-            draw_bst(tree, GetScreenWidth()/2, 50, 20);
+            draw_bst(tree);
 
             // interface
             if (GuiButton((Rectangle) {40, GetScreenHeight() - 160, 100, 40},"Clear tree"))
@@ -86,4 +102,3 @@ int main() {
     
     return 0;
 }
-
