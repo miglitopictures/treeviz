@@ -45,6 +45,7 @@ void draw_bst(BSTNode *root) {
 }
 
 void insert_starting_nodes(BSTNode **tree) {
+    free_bst(tree);
     insert_bst(tree, 50);
     insert_bst(tree, 20);
     insert_bst(tree, 70);
